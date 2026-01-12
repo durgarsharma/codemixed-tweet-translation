@@ -1,0 +1,5 @@
+Model,Positive,Neutral,Negative,Total
+xlm-roberta,5777 (21.1%),11710 (42.9%),9831 (36.0%),27318
+mbert,8341 (30.5%),1040 (3.8%),17937 (65.7%),27318
+xlm-roberta-translated,5803 (21.2%),11387 (41.7%),10128 (37.1%),27318
+bert-sentiment-translated,5101 (18.7%),16682 (61.1%),5535 (20.3%),27318
