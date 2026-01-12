@@ -21,7 +21,3 @@ Hindi and English (Hi–En) code mixing is widespread across Indian social media
 - Systematic improvements: 11.5% neutral → negative (better detection)
 - Minimal distortion: Only 13.3 character average length increases
 
-
-
-## Website License
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
