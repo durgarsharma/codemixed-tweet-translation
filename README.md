@@ -30,6 +30,7 @@ Hindi and English (Hi–En) code mixing is widespread across Indian social media
 ## Dataset
 We collect a dataset of 27,314 tweets directed at Indian athletes spanning a decade (2013-2023). Our dataset covers 6 athletes across 3 sports (Cricket, Boxing, Wrestling).
 | Athlete | Sport | Period  | Tweets |
+| :--- | :--- | :--- | :--- |
 | Virat Kohli | Cricket | May-Oct 2021 | 4,892 |
 | Harmanpreet Kaur | Cricket | May-Oct 2017 | 4,156 |
 | Vijender Singh | Boxing | Feb-Jul 2013 | 4,234 |
@@ -41,6 +42,7 @@ Human Annotations: 498 tweets with gold standard sentiment labels from 3 indepen
 
 ## Models
 | Model | Description | 
+| :--- | :--- |
 | XLM-RoBERTa | Direct multilingual sentiment classification (100+ languages, 2.5TB training data) | 
 | mBERT | Direct multilingual sentiment classification (104 languages, Wikipedia-trained) |
 | GPT-4o | Code-mixed text translation to English (OpenAI, May 2024) |
