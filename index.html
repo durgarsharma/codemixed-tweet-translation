@@ -5,19 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <!-- Basic Meta Tags -->
-  <meta name="title" content="Your Paper Title">
-  <meta name="description" content="Brief description of your research">
-  <meta name="author" content="Your Name">
+  <meta name="title" content="Code-Mixed Sentiment Analysis">
+  <meta name="description" content="Evaluating LLM Translation Against Multilingual Transformers on Twitter Data">
+  <meta name="author" content="Durga Sharma">
   
-  <title>Codemixed Tweet Translation</title>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./favicon.png"
+  <title>Code-Mixed Sentiment Analysis</title>
   
   <!-- CSS -->
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/index.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
@@ -28,58 +23,83 @@
   <!-- JavaScript -->
   <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script defer src="static/js/bulma-carousel.min.js"></script>
-  <script defer src="static/js/bulma-slider.min.js"></script>
-  <script defer src="static/js/index.js"></script>
 
   <style>
+  /* Clean Table Style */
   .custom-table-container {
-    background-color: #12141d;
-    padding: 40px;
-    border-radius: 20px;
+    padding: 20px 0;
     display: flex;
     justify-content: center;
   }
 
   .pretty-table {
-    border-collapse: separate;
-    border-spacing: 0;
+    border-collapse: collapse;
     width: 100%;
-    max-width: 800px;
-    border: 2px solid #4facfe;
-    border-radius: 20px;
+    max-width: 700px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(79, 172, 254, 0.3), 0 0 40px rgba(0, 242, 254, 0.1);
-    color: #ffffff;
+    background-color: #ffffff;
     font-family: 'Inter', sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .pretty-table th {
-    background-color: #1a1e2e;
-    padding: 15px;
+    background-color: #f8f9fa;
+    padding: 14px 16px;
     text-align: left;
-    border-bottom: 1px solid #333;
-    font-weight: 700;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .pretty-table td {
-    padding: 15px;
-    background-color: #1a1e2e;
-    border-bottom: 1px solid #2a2a2a;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #212529;
+    font-size: 0.95rem;
   }
 
-  /* Specific Row Colors */
-  .row-virat { color: #4facfe; } /* Blueish */
-  .row-harman { color: #00f2fe; } /* Cyan */
-  .row-sarita { color: #70e1f5; } /* Light Blue */
-  .row-sakshi { color: #4facfe; }
+  .pretty-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
 
-  /* Highlight for Sport and Tweets columns */
-  .col-sport { color: #ffd866; } /* Yellowish/Gold */
-  .col-tweets { color: #ab7fe3; font-weight: bold; } /* Purple */
-
-  .pretty-table tr:last-child td {
+  .pretty-table tbody tr:last-child td {
     border-bottom: none;
+  }
+
+  .pretty-table td:first-child {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .col-tweets {
+    font-weight: 500;
+    color: #495057;
+  }
+
+  /* Results Section Styling */
+  .result-item {
+    margin-bottom: 60px;
+  }
+
+  .result-item img {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .result-item .subtitle {
+    margin-top: 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4a5568;
   }
   </style>
 </head>
@@ -132,7 +152,6 @@
                   <span>Code</span>
                   </a>
                 </span>
-
                 
               </div>
             </div>
@@ -158,40 +177,41 @@
     </div>
   </section>
 
-  <!-- Key Results / Visualizations -->
+  <!-- Key Results - Vertical Layout -->
   <section class="hero is-small">
     <div class="hero-body">
-      <div class="container">
-        <h2 class="title is-3">Key Results</h2>
-        <div id="results-carousel" class="carousel results-carousel">
-          
-          <div class="item">
-            <img src="static/images/fig1_distribution_comparison.png" alt="Result 1: Multilingual Models Disagree"/>
-            <h2 class="subtitle has-text-centered">
-              State of the art multilingual models show extreme divergence: XLM-RoBERTa classifies 42.9% as neutral while mBERT classifies only 3.8%, revealing fundamental disagreement on code-mixed sentiment.
-            </h2>
-          </div>
-          
-          <div class="item">
-            <img src="static/images/fig_confusion_matrices_human.png" alt="Result 2: Human Evaluation Validates Difficulty"/>
-            <h2 class="subtitle has-text-centered">
-              Against human gold standard labels, both XLM-RoBERTa and mBERT achieve only moderate performance (F1 ≈ 0.59) with catastrophic failure on neutral sentiment classification.
-            </h2>
-          </div>
-          
-          <div class="item">
-            <img src="static/images/fig_translation_quality.png" alt="Result 3: Translation Works Well"/>
-            <h2 class="subtitle has-text-centered">
-              LLM based translation achieves 76.4% sentiment preservation with systematic improvements: 11.5% neutral → negative corrections enhance cyberbullying detection while maintaining minimal distortion.
-            </h2>
-          </div>
-          
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Key Results</h2>
+        
+        <!-- Result 1 -->
+        <div class="result-item">
+          <img src="static/images/fig1_distribution_comparison.png" alt="Result 1: Multilingual Models Disagree"/>
+          <h2 class="subtitle has-text-centered">
+            State of the art multilingual models show extreme divergence: XLM-RoBERTa classifies 42.9% as neutral while mBERT classifies only 3.8%, revealing fundamental disagreement on code-mixed sentiment.
+          </h2>
         </div>
+        
+        <!-- Result 2 -->
+        <div class="result-item">
+          <img src="static/images/fig_confusion_matrices_human.png" alt="Result 2: Human Evaluation Validates Difficulty"/>
+          <h2 class="subtitle has-text-centered">
+            Against human gold standard labels, both XLM-RoBERTa and mBERT achieve only moderate performance (F1 ≈ 0.59) with catastrophic failure on neutral sentiment classification.
+          </h2>
+        </div>
+        
+        <!-- Result 3 -->
+        <div class="result-item">
+          <img src="static/images/fig_translation_quality.png" alt="Result 3: Translation Works Well"/>
+          <h2 class="subtitle has-text-centered">
+            LLM based translation achieves 76.4% sentiment preservation with systematic improvements: 11.5% neutral → negative corrections enhance cyberbullying detection while maintaining minimal distortion.
+          </h2>
+        </div>
+        
       </div>
     </div>
   </section>
 
-  <!-- Section -->
+  <!-- Dataset Section -->
   <section class="section hero is-light">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
@@ -199,67 +219,68 @@
           <h2 class="title is-3">Dataset</h2>
           <div class="content has-text-justified">
             <p>
-              We collected 27,314 unique tweets directed at six Indian athletes across Cricket, Boxing, and Wrestling over a decade (2013-2023). The dataset exhibits substantial linguistic diversity: 87.84% English-only, 12.01% Hindi-English code-mixed, and 0.11% Hindi-only tweets. Code-mixing intensity varies dramatically by athlete, ranging from 0.5% (Vijender Singh) to 48.1% (Sakshi Malik), reflecting differences in fan demographics and communication preferences. For code-mixed tweets, the mean Hindi character ratio of 0.58 indicates balanced bilingual expression rather than superficial language switching. Each athlete's collection period spans six months during their peak media visibility, capturing authentic public discourse during critical moments in their careers. The dataset includes tweet IDs, timestamps, athlete mentions, and language classifications, enabling reproducible analysis of sentiment patterns in multilingual social media contexts.
+              We collected 27,314 tweets directed at six Indian athletes (2013-2023), with 12.01% exhibiting Hindi-English code-mixing. Code-mixing intensity varied from 0.5% to 48.1% across athletes, with balanced language integration (mean Hindi ratio = 0.58) indicating genuine bilingual expression rather than superficial switching.
             </p>
             <p>
-              To validate automated predictions and establish gold-standard labels, we conducted rigorous human evaluation on 498 tweets selected via stratified random sampling (83 per athlete). Three independent annotators labeled each tweet as positive, neutral, or negative following standardized annotation guidelines emphasizing overall emotional tone and contextual interpretation. Inter-annotator agreement reached moderate levels (Cohen's κ = 0.586, 75.5% raw agreement), reflecting genuine ambiguity in social media sentiment complicated by sarcasm, cultural references, and implicit context. Gold-standard labels were derived through majority voting: 66.5% of tweets achieved full three-annotator consensus, 31.5% reached majority agreement, and 2.0% required manual adjudication. The resulting gold standard reveals significant cyberbullying presence (48.4% negative, 39.6% positive, 12.0% neutral), providing reliable benchmarks for model evaluation and establishing realistic performance expectations for automated systems processing code-mixed content.
+              Three independent annotators labeled 498 stratified-sampled tweets (83 per athlete), achieving moderate agreement (Cohen's κ = 0.586). Gold-standard labels derived via majority voting reveal 48.4% negative sentiment, establishing reliable benchmarks for evaluating automated systems on code-mixed content.
             </p>
-          <div class="custom-table-container">
-                <table class="pretty-table">
-                  <thead>
-                    <tr>
-                      <th>Athlete</th>
-                      <th>Sport</th>
-                      <th>Period</th>
-                      <th>Tweets</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                    <td class="row-virat">Virat Kohli</td>
-                    <td class="col-sport">Cricket</td>
+            
+            <div class="custom-table-container">
+              <table class="pretty-table">
+                <thead>
+                  <tr>
+                    <th>Athlete</th>
+                    <th>Sport</th>
+                    <th>Period</th>
+                    <th>Tweets</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Virat Kohli</td>
+                    <td>Cricket</td>
                     <td>May-Oct 2017</td>
                     <td class="col-tweets">4,892</td>
                   </tr>
                   <tr>
-                    <td class="row-harman">Harmanpreet Kaur</td>
-                    <td class="col-sport">Cricket</td>
+                    <td>Harmanpreet Kaur</td>
+                    <td>Cricket</td>
                     <td>May-Oct 2017</td>
                     <td class="col-tweets">4,156</td>
                   </tr>
                   <tr>
-                    <td class="row-vijender">Vijender Singh</td>
-                    <td class="col-sport">Boxing</td>
+                    <td>Vijender Singh</td>
+                    <td>Boxing</td>
                     <td>Feb-Jul 2013</td>
                     <td class="col-tweets">4,234</td>
                   </tr>
                   <tr>
-                    <td class="row-sarita">Sarita Devi</td>
-                    <td class="col-sport">Boxing</td>
+                    <td>Sarita Devi</td>
+                    <td>Boxing</td>
                     <td>Sep 2014-Feb 2015</td>
                     <td class="col-tweets">4,421</td>
                   </tr>
                   <tr>
-                    <td class="row-sushil">Sushil Kumar</td>
-                    <td class="col-sport">Wrestling</td>
+                    <td>Sushil Kumar</td>
+                    <td>Wrestling</td>
                     <td>May-Oct 2021</td>
                     <td class="col-tweets">4,567</td>
                   </tr>
                   <tr>
-                    <td class="row-sakshi">Sakshi Malik</td>
-                    <td class="col-sport">Wrestling</td>
+                    <td>Sakshi Malik</td>
+                    <td>Wrestling</td>
                     <td>Jan-Jun 2023</td>
                     <td class="col-tweets">5,044</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+            
           </div>
         </div>
       </div>
     </div>
   </section>
-
 
   <!-- Footer -->
   <footer class="footer">
