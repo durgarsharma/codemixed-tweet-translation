@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 client = anthropic.Anthropic()
 
-# Function to translate code-mixed or code-switched text
+
 def translate_text(text):
     response = client.messages.create(
         model="claude-3-5-sonnet-20240620",
@@ -29,17 +29,14 @@ def translate_text(text):
 file_name = sys.argv[1]
 output_name = sys.argv[2]
 
-# Read the input file containing tweets
 with open(file_name, 'r') as file:
     tweets = json.load(file)
 
-# Iterate through each tweet and translate if necessary
 for tweet in tqdm(tweets):
     raw_content = tweet.get('tweet rawcontent', '')
     translated_text = translate_text(raw_content)
     tweet['translated_content'] = translated_text.text
 
-# Save the updated tweets to a new file
 with open(output_name, 'w') as file:
     json.dump(tweets, file, indent=4)
 
