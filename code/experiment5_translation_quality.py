@@ -11,22 +11,19 @@ class TranslationQualityAnalysis:
     def __init__(self):
         print("Loading baseline results...")
         
-        # Load results with both raw and translated content
         self.xlm_raw = pd.read_csv('baseline_results/xlm-roberta_results.csv')
         
-        # Try to load translated results
         try:
             self.xlm_trans = pd.read_csv('baseline_results/xlm-roberta-translated_results_fixed.csv')
             self.has_translations = True
             print("✓ Found translated results")
         except:
-            print("⚠ No fixed translated results found, will analyze existing data")
+            print(" No fixed translated results found, will analyze existing data")
             self.has_translations = False
         
-        print(f"✓ Loaded {len(self.xlm_raw)} tweets")
+        print(f" Loaded {len(self.xlm_raw)} tweets")
     
     def detect_language(self, text):
-        """Detect language type"""
         if pd.isna(text):
             return 'unknown'
         text = str(text)
@@ -42,31 +39,24 @@ class TranslationQualityAnalysis:
         return 'other'
     
     def analyze_translation_impact(self):
-        """Analyze how translation affects sentiment predictions"""
-        print("\n" + "="*70)
         print("TRANSLATION IMPACT ANALYSIS")
-        print("="*70)
         
         if not self.has_translations:
             print("\n⚠ Skipping - no translated results available")
             return
         
-        # Merge raw and translated results
         merged = self.xlm_raw.merge(
             self.xlm_trans[['tweet_id', 'xlm-roberta-translated_sentiment']],
             on='tweet_id',
             how='inner'
         )
         
-        # Add language detection
         merged['language_type'] = merged['raw_content'].apply(self.detect_language)
         
-        # Focus on code-mixed tweets
         code_mixed = merged[merged['language_type'] == 'code-mixed']
         
         print(f"\nAnalyzing {len(code_mixed)} code-mixed tweets")
         
-        # Calculate agreement
         agreement = (code_mixed['xlm-roberta_sentiment'] == code_mixed['xlm-roberta-translated_sentiment']).sum()
         total = len(code_mixed)
         
@@ -74,7 +64,6 @@ class TranslationQualityAnalysis:
         print(f"  Same prediction: {agreement} / {total} ({agreement/total*100:.1f}%)")
         print(f"  Different prediction: {total-agreement} / {total} ({(total-agreement)/total*100:.1f}%)")
         
-        # Sentiment shifts
         print(f"\nSentiment Shifts (Code-Mixed Tweets):")
         for orig_sent in ['positive', 'neutral', 'negative']:
             for trans_sent in ['positive', 'neutral', 'negative']:
@@ -85,18 +74,13 @@ class TranslationQualityAnalysis:
                         print(f"  {orig_sent} → {trans_sent}: {count} ({count/total*100:.1f}%)")
     
     def analyze_length_statistics(self):
-        """Analyze tweet length before and after translation"""
-        print("\n" + "="*70)
         print("TWEET LENGTH ANALYSIS")
-        print("="*70)
         
-        # Calculate lengths
         self.xlm_raw['raw_length'] = self.xlm_raw['raw_content'].str.len()
         
         if 'translated_content' in self.xlm_raw.columns:
             self.xlm_raw['trans_length'] = self.xlm_raw['translated_content'].fillna('').str.len()
             
-            # Filter for code-mixed
             self.xlm_raw['language_type'] = self.xlm_raw['raw_content'].apply(self.detect_language)
             code_mixed = self.xlm_raw[self.xlm_raw['language_type'] == 'code-mixed']
             
@@ -109,15 +93,11 @@ class TranslationQualityAnalysis:
             print(f"    Mean: {code_mixed['trans_length'].mean():.1f} characters")
             print(f"    Median: {code_mixed['trans_length'].median():.1f} characters")
             
-            # Length change
             code_mixed['length_change'] = code_mixed['trans_length'] - code_mixed['raw_length']
             print(f"\n  Average length change: {code_mixed['length_change'].mean():.1f} characters")
     
     def analyze_sentiment_consistency(self):
-        """Analyze which sentiments are most affected by language"""
-        print("\n" + "="*70)
         print("SENTIMENT CONSISTENCY BY LANGUAGE TYPE")
-        print("="*70)
         
         self.xlm_raw['language_type'] = self.xlm_raw['raw_content'].apply(self.detect_language)
         
@@ -132,13 +112,10 @@ class TranslationQualityAnalysis:
                         print(f"  {sent:8s}: {dist[sent]:.1f}%")
     
     def sample_translations(self, n=10):
-        """Show sample translations for code-mixed tweets"""
-        print("\n" + "="*70)
         print(f"SAMPLE TRANSLATIONS (showing {n} examples)")
-        print("="*70)
         
         if 'translated_content' not in self.xlm_raw.columns:
-            print("\n⚠ No translated_content column found")
+            print("\n No translated_content column found")
             return
         
         self.xlm_raw['language_type'] = self.xlm_raw['raw_content'].apply(self.detect_language)
@@ -153,14 +130,12 @@ class TranslationQualityAnalysis:
                 print(f"   SENTIMENT: {row['xlm-roberta_sentiment']}")
     
     def plot_translation_analysis(self):
-        """Create visualization"""
         if not self.has_translations:
-            print("\n⚠ Skipping plots - no translation data")
+            print("\n Skipping plots - no translation data")
             return
         
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
         
-        # Agreement matrix
         merged = self.xlm_raw.merge(
             self.xlm_trans[['tweet_id', 'xlm-roberta-translated_sentiment']],
             on='tweet_id',
@@ -170,7 +145,6 @@ class TranslationQualityAnalysis:
         code_mixed = merged[merged['language_type'] == 'code-mixed']
         
         if len(code_mixed) > 0:
-            # Confusion matrix
             labels = ['positive', 'neutral', 'negative']
             confusion = np.zeros((3, 3))
             label_to_idx = {'positive': 0, 'neutral': 1, 'negative': 2}
@@ -196,7 +170,6 @@ class TranslationQualityAnalysis:
             axes[0].set_ylabel('Raw Sentiment', fontsize=12)
             axes[0].set_title('Translation Impact on Code-Mixed Tweets', fontsize=12, fontweight='bold')
         
-        # Sentiment by language type
         self.xlm_raw['language_type'] = self.xlm_raw['raw_content'].apply(self.detect_language)
         
         lang_sentiment = []
@@ -229,13 +202,11 @@ class TranslationQualityAnalysis:
         
         plt.tight_layout()
         plt.savefig('paper_figures/fig_translation_quality.png', dpi=300, bbox_inches='tight')
-        print("\n✓ Saved: paper_figures/fig_translation_quality.png")
+        print("\n Saved: paper_figures/fig_translation_quality.png")
         plt.close()
 
 if __name__ == "__main__":
-    print("="*70)
     print("EXPERIMENT 5: TRANSLATION QUALITY ASSESSMENT")
-    print("="*70)
     
     analyzer = TranslationQualityAnalysis()
     analyzer.analyze_translation_impact()
@@ -243,7 +214,3 @@ if __name__ == "__main__":
     analyzer.analyze_sentiment_consistency()
     analyzer.sample_translations(n=5)
     analyzer.plot_translation_analysis()
-    
-    print("\n" + "="*70)
-    print("✓ EXPERIMENT 5 COMPLETE!")
-    print("="*70)
