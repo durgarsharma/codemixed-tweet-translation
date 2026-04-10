@@ -11,7 +11,6 @@ warnings.filterwarnings('ignore')
 
 class LanguageMixingAnalysis:
     def __init__(self, data_file='all_tweets_combined.csv'):
-        # Robust CSV loading
         print(f"Loading {data_file}...")
         try:
             self.df = pd.read_csv(
@@ -24,7 +23,6 @@ class LanguageMixingAnalysis:
             )
         except Exception as e:
             print(f"Method 1 failed, trying alternative...")
-            # Read line by line if needed
             import csv
             data_rows = []
             with open(data_file, 'r', encoding='utf-8', errors='ignore') as f:
@@ -37,13 +35,11 @@ class LanguageMixingAnalysis:
         print(f"✓ Loaded {len(self.df)} tweets")
         
     def detect_language_simple(self, text):
-        """Detect if text contains Hindi (Devanagari script)"""
         if pd.isna(text):
             return 'unknown'
         
         text = str(text)
         
-        # Check for Devanagari Unicode range
         has_hindi = bool(re.search(r'[\u0900-\u097F]', text))
         has_english = bool(re.search(r'[a-zA-Z]', text))
         
@@ -57,15 +53,12 @@ class LanguageMixingAnalysis:
             return 'other'
     
     def calculate_mixing_ratio(self, text):
-        """Calculate the ratio of Hindi to English words"""
         if pd.isna(text):
             return 0
         
         text = str(text)
         
-        # Count Devanagari characters
         hindi_chars = len(re.findall(r'[\u0900-\u097F]', text))
-        # Count English characters
         english_chars = len(re.findall(r'[a-zA-Z]', text))
         
         total = hindi_chars + english_chars
@@ -75,17 +68,12 @@ class LanguageMixingAnalysis:
         return hindi_chars / total
     
     def analyze_dataset(self):
-        """Analyze language composition of dataset"""
-        print("\n" + "="*70)
         print("LANGUAGE COMPOSITION ANALYSIS")
-        print("="*70)
         
-        # Detect language for each tweet
         print("Detecting languages...")
         self.df['language_type'] = self.df['raw_content'].apply(self.detect_language_simple)
         self.df['hindi_ratio'] = self.df['raw_content'].apply(self.calculate_mixing_ratio)
         
-        # Statistics
         lang_dist = self.df['language_type'].value_counts()
         total = len(self.df)
         
@@ -94,7 +82,6 @@ class LanguageMixingAnalysis:
             pct = (count / total) * 100
             print(f"  {lang:12s}: {count:5d} ({pct:5.2f}%)")
         
-        # Code-mixing intensity for code-mixed tweets
         code_mixed = self.df[self.df['language_type'] == 'code-mixed']
         if len(code_mixed) > 0:
             print(f"\nCode-Mixed Tweets Analysis:")
@@ -106,14 +93,10 @@ class LanguageMixingAnalysis:
         return self.df
     
     def analyze_by_athlete(self):
-        """Analyze language mixing by athlete"""
-        print("\n" + "="*70)
         print("LANGUAGE MIXING BY ATHLETE")
-        print("="*70)
         
-        # Skip if no athlete column
         if 'athlete_display_name' not in self.df.columns:
-            print("⚠ No athlete_display_name column found")
+            print("No athlete_display_name column found")
             return
         
         athlete_lang = self.df.groupby('athlete_display_name')['language_type'].value_counts(normalize=True) * 100
@@ -121,10 +104,8 @@ class LanguageMixingAnalysis:
         print(athlete_lang.round(1))
         
     def plot_language_distribution(self):
-        """Visualize language distribution"""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
         
-        # Overall distribution
         lang_counts = self.df['language_type'].value_counts()
         colors = {'code-mixed': '#e74c3c', 'english': '#3498db', 'hindi': '#2ecc71', 'other': '#95a5a6'}
         
@@ -137,7 +118,6 @@ class LanguageMixingAnalysis:
         )
         ax1.set_title('Language Distribution in Dataset', fontsize=14, fontweight='bold')
         
-        # Hindi ratio distribution for code-mixed tweets
         code_mixed = self.df[self.df['language_type'] == 'code-mixed']
         if len(code_mixed) > 0:
             ax2.hist(code_mixed['hindi_ratio'], bins=20, color='#e74c3c', alpha=0.7, edgecolor='black')
@@ -158,10 +138,7 @@ class LanguageMixingAnalysis:
         plt.close()
     
     def sample_tweets_by_type(self):
-        """Show sample tweets for each language type"""
-        print("\n" + "="*70)
         print("SAMPLE TWEETS BY LANGUAGE TYPE")
-        print("="*70)
         
         for lang_type in ['code-mixed', 'english', 'hindi']:
             tweets = self.df[self.df['language_type'] == lang_type]
@@ -172,7 +149,6 @@ class LanguageMixingAnalysis:
                     print(f"  {tweet['raw_content'][:100]}...")
     
     def create_summary_table(self):
-        """Create LaTeX table for paper"""
         lang_dist = self.df['language_type'].value_counts()
         total = len(self.df)
         
@@ -206,7 +182,6 @@ class LanguageMixingAnalysis:
         
         print("\n✓ Saved: paper_tables/table_language_composition.tex")
         
-        # Also save as CSV
         summary_data = []
         for lang in lang_dist.index:
             count = lang_dist[lang]
@@ -223,40 +198,22 @@ class LanguageMixingAnalysis:
         
         return latex
 
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
 
 if __name__ == "__main__":
     import os
     os.makedirs('paper_figures', exist_ok=True)
     os.makedirs('paper_tables', exist_ok=True)
     
-    print("="*70)
     print("EXPERIMENT 1: LANGUAGE DETECTION & CODE-MIXING ANALYSIS")
-    print("="*70)
     
     analyzer = LanguageMixingAnalysis()
     
-    # Analyze dataset
     analyzer.analyze_dataset()
     
-    # By athlete
     analyzer.analyze_by_athlete()
     
-    # Show samples
     analyzer.sample_tweets_by_type()
     
-    # Visualize
     analyzer.plot_language_distribution()
     
-    # Create table
     analyzer.create_summary_table()
-    
-    print("\n" + "="*70)
-    print("✓ EXPERIMENT 1 COMPLETE!")
-    print("="*70)
-    print("\nKey Findings:")
-    print("- Quantified code-mixing prevalence in dataset")
-    print("- Generated publication-quality figure")
-    print("- Created LaTeX table for paper")
