@@ -11,14 +11,12 @@ class ConfidenceAnalysis:
     def __init__(self):
         print("Loading data...")
         
-        # Load baseline results
         self.xlm_df = pd.read_csv('baseline_results/xlm-roberta_results.csv')
         self.mbert_df = pd.read_csv('baseline_results/mbert_results.csv')
         
         print(f"✓ Loaded {len(self.xlm_df)} XLM-RoBERTa predictions")
         print(f"✓ Loaded {len(self.mbert_df)} mBERT predictions")
         
-        # Detect language type directly from raw_content in baseline results
         print("Detecting language types...")
         self.xlm_df['language_type'] = self.xlm_df['raw_content'].apply(self.detect_language)
         self.mbert_df['language_type'] = self.mbert_df['raw_content'].apply(self.detect_language)
@@ -26,13 +24,11 @@ class ConfidenceAnalysis:
         print("✓ Language detection complete")
     
     def detect_language(self, text):
-        """Detect if text contains Hindi (Devanagari script)"""
         if pd.isna(text):
             return 'unknown'
         
         text = str(text)
         
-        # Check for Devanagari Unicode range
         has_hindi = bool(re.search(r'[\u0900-\u097F]', text))
         has_english = bool(re.search(r'[a-zA-Z]', text))
         
@@ -46,10 +42,7 @@ class ConfidenceAnalysis:
             return 'other'
     
     def analyze_confidence_by_language(self):
-        """Compare confidence scores between English and code-mixed"""
-        print("\n" + "="*70)
         print("CONFIDENCE ANALYSIS BY LANGUAGE TYPE")
-        print("="*70)
         
         results = []
         
@@ -72,7 +65,6 @@ class ConfidenceAnalysis:
             print(f"    Median confidence: {code_mixed.median():.4f}")
             print(f"    Std: {code_mixed.std():.4f}")
             
-            # T-test
             from scipy.stats import ttest_ind
             if len(english) > 0 and len(code_mixed) > 0:
                 t_stat, p_val = ttest_ind(english, code_mixed)
@@ -81,7 +73,6 @@ class ConfidenceAnalysis:
                 sig = "SIGNIFICANT" if p_val < 0.05 else "NOT SIGNIFICANT"
                 print(f"  Result: {sig} difference in confidence")
                 
-                # Effect size (Cohen's d)
                 pooled_std = np.sqrt(((len(english)-1)*english.std()**2 + (len(code_mixed)-1)*code_mixed.std()**2) / (len(english)+len(code_mixed)-2))
                 cohens_d = (english.mean() - code_mixed.mean()) / pooled_std
                 print(f"  Effect size (Cohen's d): {cohens_d:.4f}")
@@ -98,10 +89,7 @@ class ConfidenceAnalysis:
         return results
     
     def analyze_confidence_by_sentiment(self):
-        """Analyze confidence scores by sentiment class"""
-        print("\n" + "="*70)
         print("CONFIDENCE BY SENTIMENT CLASS")
-        print("="*70)
         
         for model_name, df, score_col, sent_col in [
             ('XLM-RoBERTa', self.xlm_df, 'xlm-roberta_score', 'xlm-roberta_sentiment'),
@@ -115,7 +103,6 @@ class ConfidenceAnalysis:
                     print(f"  {sentiment:8s}: mean={scores.mean():.4f}, std={scores.std():.4f}")
     
     def plot_confidence_comparison(self):
-        """Visualize confidence by language type"""
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
         
         for idx, (model_name, df, score_col) in enumerate([
@@ -136,7 +123,6 @@ class ConfidenceAnalysis:
             if len(data_to_plot) > 0:
                 bp = ax.boxplot(data_to_plot, labels=labels, patch_artist=True)
                 
-                # Color boxes
                 colors = ['#3498db', '#e74c3c']
                 for patch, color in zip(bp['boxes'], colors[:len(data_to_plot)]):
                     patch.set_facecolor(color)
@@ -150,18 +136,16 @@ class ConfidenceAnalysis:
         
         plt.tight_layout()
         plt.savefig('paper_figures/fig_confidence_comparison.png', dpi=300, bbox_inches='tight')
-        print("\n✓ Saved: paper_figures/fig_confidence_comparison.png")
+        print("\n Saved: paper_figures/fig_confidence_comparison.png")
         plt.close()
     
     def plot_confidence_distribution(self):
-        """Plot distribution of confidence scores"""
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
         
         for idx, (model_name, df, score_col) in enumerate([
             ('XLM-RoBERTa', self.xlm_df, 'xlm-roberta_score'),
             ('mBERT', self.mbert_df, 'mbert_score')
         ]):
-            # English
             ax1 = axes[idx, 0]
             english_scores = df[df['language_type'] == 'english'][score_col].dropna()
             if len(english_scores) > 0:
@@ -174,7 +158,6 @@ class ConfidenceAnalysis:
                 ax1.legend()
                 ax1.grid(axis='y', alpha=0.3)
             
-            # Code-mixed
             ax2 = axes[idx, 1]
             code_mixed_scores = df[df['language_type'] == 'code-mixed'][score_col].dropna()
             if len(code_mixed_scores) > 0:
@@ -189,11 +172,10 @@ class ConfidenceAnalysis:
         
         plt.tight_layout()
         plt.savefig('paper_figures/fig_confidence_distribution.png', dpi=300, bbox_inches='tight')
-        print("✓ Saved: paper_figures/fig_confidence_distribution.png")
+        print("Saved: paper_figures/fig_confidence_distribution.png")
         plt.close()
     
     def create_summary_table(self, results):
-        """Create LaTeX table"""
         latex = "\\begin{table}[H]\n"
         latex += "    \\centering\n"
         latex += "    \\caption{Model Confidence: English vs. Code-Mixed Tweets}\n"
@@ -216,9 +198,7 @@ class ConfidenceAnalysis:
         print("\n✓ Saved: paper_tables/table_confidence_comparison.tex")
 
 if __name__ == "__main__":
-    print("="*70)
     print("EXPERIMENT 3: CONFIDENCE SCORE ANALYSIS")
-    print("="*70)
     
     analyzer = ConfidenceAnalysis()
     results = analyzer.analyze_confidence_by_language()
@@ -226,7 +206,3 @@ if __name__ == "__main__":
     analyzer.plot_confidence_comparison()
     analyzer.plot_confidence_distribution()
     analyzer.create_summary_table(results)
-    
-    print("\n" + "="*70)
-    print("✓ EXPERIMENT 3 COMPLETE!")
-    print("="*70)
