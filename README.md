@@ -1,4 +1,4 @@
-# Code-Mixed Sentiment Analysis: Evaluating LLM Translation Against Multilingual Transformers on Twitter Data
+# HiEnSports: A Benchmark Dataset for Hindi and English Code Mixed Sentiment Analysis in Indian Sports Discourse
 
 > https://durgarsharma.github.io/codemixed-tweet-translation/
 
