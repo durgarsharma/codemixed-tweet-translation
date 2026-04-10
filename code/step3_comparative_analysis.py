@@ -12,18 +12,14 @@ class ComparativeAnalysis:
         self.models = {}
         
     def load_model_results(self, model_key):
-        """Load a model's results"""
         file_path = f"{self.baseline_folder}/{model_key}_results.csv"
         df = pd.read_csv(file_path)
         self.models[model_key] = df
-        print(f"✓ Loaded {model_key}: {len(df)} tweets")
+        print(f" Loaded {model_key}: {len(df)} tweets")
         return df
     
     def analyze_distributions(self):
-        """Analyze sentiment distributions across models"""
-        print(f"\n{'='*70}")
         print("SENTIMENT DISTRIBUTION ANALYSIS")
-        print(f"{'='*70}")
         
         dist_data = []
         
@@ -51,7 +47,6 @@ class ComparativeAnalysis:
         return dist_df
     
     def plot_distributions(self, output_file='distribution_comparison.png'):
-        """Plot sentiment distributions"""
         dist_data = []
         
         for model_key, df in self.models.items():
@@ -67,7 +62,6 @@ class ComparativeAnalysis:
         
         dist_df = pd.DataFrame(dist_data)
         
-        # Plot
         fig, ax = plt.subplots(figsize=(10, 6))
         
         x = np.arange(len(dist_df))
@@ -86,14 +80,11 @@ class ComparativeAnalysis:
         
         plt.tight_layout()
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
-        print(f"\n✓ Saved distribution plot: {output_file}")
+        print(f"\n Saved distribution plot: {output_file}")
         plt.show()
     
     def analyze_by_athlete(self):
-        """Analyze sentiment by athlete"""
-        print(f"\n{'='*70}")
         print("SENTIMENT BY ATHLETE")
-        print(f"{'='*70}")
         
         for model_key, df in self.models.items():
             sentiment_col = f'{model_key}_sentiment'
@@ -106,15 +97,11 @@ class ComparativeAnalysis:
             print(athlete_sentiment.round(1))
     
     def agreement_analysis(self, model1_key, model2_key):
-        """Analyze agreement between two models"""
-        print(f"\n{'='*70}")
         print(f"AGREEMENT: {model1_key} vs {model2_key}")
-        print(f"{'='*70}")
         
         df1 = self.models[model1_key]
         df2 = self.models[model2_key]
         
-        # Merge on tweet_id
         merged = df1.merge(
             df2[['tweet_id', f'{model2_key}_sentiment']],
             on='tweet_id',
@@ -124,14 +111,12 @@ class ComparativeAnalysis:
         sent1 = merged[f'{model1_key}_sentiment']
         sent2 = merged[f'{model2_key}_sentiment']
         
-        # Calculate agreement
         agreement = (sent1 == sent2).sum()
         total = len(merged)
         agreement_pct = (agreement / total) * 100
         
         print(f"\nOverall Agreement: {agreement}/{total} ({agreement_pct:.1f}%)")
         
-        # Per-label agreement
         print(f"\nAgreement by Label:")
         for label in ['positive', 'neutral', 'negative']:
             both_label = ((sent1 == label) & (sent2 == label)).sum()
@@ -140,32 +125,19 @@ class ComparativeAnalysis:
                 pct = (both_label / either_label) * 100
                 print(f"  {label:8s}: {both_label}/{either_label} ({pct:.1f}%)")
 
-# ============================================================================
-# MAIN EXECUTION
-# ============================================================================
+
 
 if __name__ == "__main__":
-    print("="*70)
     print("STEP 3B: COMPARATIVE ANALYSIS (NO HUMAN ANNOTATIONS)")
-    print("="*70)
     
-    # Initialize
     analyzer = ComparativeAnalysis()
     
-    # Load model results
     analyzer.load_model_results('xlm-roberta')
     analyzer.load_model_results('mbert')
     
-    # Analyze distributions
     analyzer.analyze_distributions()
     analyzer.plot_distributions()
     
-    # Analyze by athlete
     analyzer.analyze_by_athlete()
     
-    # Agreement between models
     analyzer.agreement_analysis('xlm-roberta', 'mbert')
-    
-    print("\n" + "="*70)
-    print("✓ COMPARATIVE ANALYSIS COMPLETE!")
-    print("="*70)
