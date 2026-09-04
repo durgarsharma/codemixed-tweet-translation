@@ -1,59 +1,62 @@
-# HiEnSports: A Benchmark Dataset for Hindi and English Code Mixed Sentiment Analysis in Indian Sports Discourse
-
-> https://durgarsharma.github.io/codemixed-tweet-translation/
+# Do Multilingual Transformers Beat Translation? Sentiment Analysis on Hindi and English Code Mixed Sports Discourse
 
 ## Abstract
-Hindi and English (Hi–En) code mixing is widespread across Indian social media and remains a major challenge for sentiment analysis and cyberbullying detection. Current multilingual models struggle with this type of data, often giving inconsistent predictions and showing lower confidence. In this work, 27,314 tweets directed at six Indian athletes across three sports (2013–2023) to understand how code mixing affects automated sentiment classification. It was found that 12\% of tweets contain Hi–En code mixing, with significant differences across athletes, and that 48.4\% of all tweets are negative, with Wrestling athletes receiving the highest levels of negativity. Compared the state of the art multilingual models (XLM-RoBERTa, mBERT) with an LLM based translation pipeline and found that these models show only fair agreement on code mixed tweets, highlighting the difficulty of the task. Human evaluation on 498 tweets provides gold standard labels and shows that both multilingual models reach only moderate performance. Overall, the results show the limitations of current multilingual systems for processing code mixed text and demonstrate that translation based workflows offer a strong alternative for sentiment analysis in linguistically diverse social media settings.
+Hindi and English (Hi-En) code mixing is common on Indian social media, yet sentiment analysis on such text is difficult to evaluate without a human annotated gold standard. We compare two approaches to code mixed sentiment classification, multilingual transformers (XLM-RoBERTa, mBERT) and an LLM based translation pipeline that translates text to English before classifying it with VADER. Using 27,314 tweets directed at six Indian athletes and a 498 tweet gold standard annotated by three bilingual raters (Fleiss’ κ = 0.615, Krippendorff’s α = 0.616), we observe that the translation pipeline (weighted F1 = 0.589) performs comparably to XLM-RoBERTa (McNemar p=0.598) and approaches mBERT (F1 = 0.590, p = 0.046). Error analysis reveals distinct failure modes, XLM-RoBERTa over predicts neutral for polar tweets while mBERT over predicts negative, yet all three approaches converge at the same F1 ceiling, suggesting the bottleneck lies in semantic ambiguity rather than code mixing itself. For Hi-En sentiment analysis, this suggests translation pipelines could serve as a light weight alternative to multilingual transformers.
 
-## Result 1: Multiligual Models Disagree
-- Low agreement: Cohen's κ = 0.253 between XLM-RoBERTa and mBERT
-- Statistical significance: χ² = 11,761, p < 0.001
-- Extreme divergence: XLM-RoBERTa classifies 42.9%, and mBERT classifies 3.8% as neutral
-- Reduced confidence: Both models show significantly lower confidence on code-mixed text (p < 0.001)
+## Key Findings
 
-## Result 2: Human Evaluation Validates Difficulty
-- Moderate inter annotator agreement: Cohen's κ = 0.586
-- Both models achieve F1 ≈ 0.59 against gold standard
-- Neutral failure: mBERT F1 = 0.07 for neutral sentiment
+### Finding 1: All Approaches Hit the Same Ceiling
+- Translation+VADER (F1 = 0.589), XLM-RoBERTa (F1 = 0.591), and mBERT (F1 = 0.590) converge at F1 ≈ 0.59
+- McNemar's test: no significant difference between translation pipeline and XLM-RoBERTa (p = 0.598)
+- Computationally cheaper translation pipelines match multilingual transformers
 
-## Result 3: Translation Works Well
-- 76.4% sentiment preservation between raw and translated
-- Systematic improvements: 11.5% neutral → negative (better detection)
-- Minimal distortion: Only 13.3 character average length increases
+### Finding 2: Complementary Failure Modes
+- XLM-RoBERTa over-predicts neutral: 88 positive and 84 negative tweets misclassified as neutral
+- mBERT nearly ignores neutral (F1_neu = 0.075), instead over-predicting negative
+- 65.1% of errors show no obvious surface-level trigger — failures are semantic, not linguistic
 
-## Highlights
-- We benchmark XLM-RoBERTa and mBERT on 27,314 code-mixed tweets, achieving only fair agreement (κ = 0.253) and F1 = 0.59 against human labels.
-- We validate LLM translation with 76.4% sentiment preservation and 11.5% cyberbullying detection improvement, while models show significantly reduced confidence on mixed text (p < 0.001).
-- We conduct human evaluation (498 tweets, κ = 0.586) revealing catastrophic neutral classification failure (F1 = 0.07-0.35) and moderate overall performance across all models.
-- We quantify sport-specific cyberbullying: Wrestling 50-77% negative, Cricket 19-45% negative, with code-mixed tweets showing higher negativity (43.4% vs. 35.0%).
+### Finding 3: Rigorous Human Evaluation
+- Three bilingual annotators, 498 tweets
+- Fleiss' κ = 0.615, Krippendorff's α = 0.616 (substantial agreement)
+- Gold label distribution: 48.4% negative, 39.6% positive, 12.0% neutral
+
+### Finding 4: Translation Preserves Sentiment
+- 76.4% sentiment label retention after LLM translation
+- Translation surfaces hostile content: 11.5% neutral → negative shift
+- Translated VADER significantly outperforms raw VADER (McNemar p < 0.001)
+
+### Finding 5: Sport-Specific Negativity
+- Wrestling: 49.8% (XLM) to 76.6% (mBERT) negative
+- Boxing: 38.9% (XLM) to 75.6% (mBERT) negative
+- Cricket: 18.9% (XLM) to 44.8% (mBERT) negative
 
 ## Dataset
-We collect a dataset of 27,314 tweets directed at Indian athletes spanning a decade (2013-2023). Our dataset covers 6 athletes across 3 sports (Cricket, Boxing, Wrestling).
-| Athlete | Sport | Period  | Tweets |
-| :--- | :--- | :--- | :--- |
-| Virat Kohli | Cricket | May-Oct 2021 | 4,892 |
-| Harmanpreet Kaur | Cricket | May-Oct 2017 | 4,156 |
-| Vijender Singh | Boxing | Feb-Jul 2013 | 4,234 |
-| Sarita Devi | Boxing | Sep 2014-Feb 2015 | 4,421 |
-| Sushil Kumar | Wrestling | May-Oct 2021 | 4,567 |
-| Sakshi Malik | Wrestling | Jan-Jun 2023 | 5,044 |
+27,314 tweets directed at six Indian athletes across three sports (2013–2023).
 
-Human Annotations: 498 tweets with gold standard sentiment labels from 3 independent annotators (Cohen's κ = 0.586).
+| Athlete | Sport | Period | CM% | Tweets |
+| :--- | :--- | :--- | :--- | :--- |
+| Virat Kohli | Cricket | May–Oct 2021 | 2.3% | 4,892 |
+| Harmanpreet Kaur | Cricket | May–Oct 2017 | 4.2% | 4,156 |
+| Vijender Singh | Boxing | Feb–Jul 2013 | 0.5% | 4,234 |
+| Sarita Devi | Boxing | Sep 2014–Feb 2015 | 6.8% | 4,421 |
+| Sushil Kumar | Wrestling | May–Oct 2021 | 15.7% | 4,567 |
+| Sakshi Malik | Wrestling | Jan–Jun 2023 | 48.1% | 5,044 |
+
+CM% = code-mixed tweet proportion. Language composition: 87.84% English, 12.01% Hi-En code-mixed, 0.11% Hindi.
 
 ## Models
-| Model | Description | 
-| :--- | :--- |
-| XLM-RoBERTa | Direct multilingual sentiment classification (100+ languages, 2.5TB training data) | 
-| mBERT | Direct multilingual sentiment classification (104 languages, Wikipedia-trained) |
-| GPT-4o | Code-mixed text translation to English (OpenAI, May 2024) |
-| Claude 3.5 | Code-mixed text translation to English (Anthropic, June 2024) |
+| Model | Role | Input |
+| :--- | :--- | :--- |
+| XLM-RoBERTa | Sentiment classification | Raw code-mixed tweets |
+| mBERT | Sentiment classification | Raw code-mixed tweets |
+| GPT-4o | Translation to English | Raw code-mixed tweets |
+| Claude 3.5 Sonnet | Translation to English | Raw code-mixed tweets |
+| VADER | Sentiment classification | Translated English tweets |
 
-## Example 
-*Code Mixed Hi-En:* ”Yaar, kal ka match bohot intense tha, but Virat ne
-amazing performance di!”  
-*Translated Tweet:* “Man, yesterday’s match was very intense, but Virat gave an amazing performance!”
+## Example
+**Code-mixed Hi-En:** "Yaar, kal ka match bohot intense tha, but Virat ne amazing performance di!"
+**Translated:** "Man, yesterday's match was very intense, but Virat gave an amazing performance!"
 
-*Code Switched Hi-En:* ”I can’t believe we lost the game, lekin Virat ne
-bohot achha khela.”  
-*Translated Tweet:* “I can’t believe we lost the game, but Virat played really well.”
+**Code-switched Hi-En:** "I can't believe we lost the game, lekin Virat ne bohot achha khela."
+**Translated:** "I can't believe we lost the game, but Virat played really well."
 
